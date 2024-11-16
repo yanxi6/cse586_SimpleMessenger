@@ -1,7 +1,10 @@
 package edu.buffalo.cse.cse486586.simplemessenger;
 
+import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -156,7 +159,35 @@ public class SimpleMessengerActivity extends Activity {
              * TODO: Fill in your server code that receives messages and passes them
              * to onProgressUpdate().
              */
-            return null;
+            while (true) {
+                Socket socket = null;
+                BufferedReader br = null;
+                PrintWriter pw = null;
+                try {
+                    socket = serverSocket.accept();
+                    br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    String inputMsg = br.readLine();
+                    if (inputMsg != null) {
+                        pw = new PrintWriter(socket.getOutputStream(), true);
+                        pw.println(inputMsg);
+                        publishProgress(inputMsg);
+                    } else {
+
+                    }
+                } catch(Exception e) {
+
+                } finally {
+                    try {
+                        br.close();
+                        pw.close();
+                        socket.close();
+                    } catch (Exception e) {
+
+                    }
+
+                }
+            }
+            // return null;
         }
 
         protected void onProgressUpdate(String...strings) {
@@ -216,6 +247,10 @@ public class SimpleMessengerActivity extends Activity {
                 /*
                  * TODO: Fill in your client code that sends out a message.
                  */
+                PrintWriter pw = new PrintWriter(socket.getOutputStream(), true);
+                BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                pw.println(msgToSend);
+                pw.close();
                 socket.close();
             } catch (UnknownHostException e) {
                 Log.e(TAG, "ClientTask UnknownHostException");
